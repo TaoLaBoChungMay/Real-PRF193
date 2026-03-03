@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
 
 		switch (choice) {
 			case 1 : {				// 1. Add flight schedules
+				int a =0;
 				break;
 			}
 
