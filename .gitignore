@@ -1,0 +1,11 @@
+# Build files
+*.o
+*.exe
+*.out
+
+# Dev C++
+*.layout
+*.dev
+
+# VSCode
+.vscode/
