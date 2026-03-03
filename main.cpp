@@ -1,8 +1,6 @@
 #include <iostream>
 #include "ConsoleIO.h"
-
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
-
+#include "FlightManagement.h"
 int main(int argc, char** argv) {
 
 	ConsoleIO cIO;

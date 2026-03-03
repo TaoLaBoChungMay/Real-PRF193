@@ -3,6 +3,7 @@
 #ifndef FLIGHT_H
 #define FLIGHT_H
 
+using namespace std;
 class Flight {
 	private :
 		string FlightID;
@@ -29,7 +30,7 @@ class Flight {
 			return DepartureTime;
 		}
 
-		string getTicketPrice () {
+		double getTicketPrice () {
 			return TicketPrice;
 		}
 		// Setter
