@@ -26,3 +26,4 @@ int ConsoleIO::showMenu()
 		cin >> choice;
 	}
 	return choice;
+}
