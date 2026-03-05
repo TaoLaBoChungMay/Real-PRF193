@@ -4,6 +4,7 @@
 int main(int argc, char** argv) {
 
 	ConsoleIO cIO;
+	FlightManagement FMng;
 
 	int choice = -1;
 	do {
@@ -11,7 +12,7 @@ int main(int argc, char** argv) {
 
 		switch (choice) {
 			case 1 : {				// 1. Add flight schedules
-				int a =0;
+				FMng.addFlightSchedule();
 				break;
 			}
 

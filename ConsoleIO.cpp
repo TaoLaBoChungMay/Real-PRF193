@@ -4,11 +4,10 @@
 using namespace std;
 
 //========================= DISPLAY MENU==============//
-int ConsoleIO::showMenu()
-{
+int ConsoleIO::showMenu() {
 	int choice = -1;
 	cout << "=================== MENU ====================== \n";
-	cout << "1. Add flight schedules \n";
+	cout << "1. Add flight schedules (<= 100 Schedules) \n";
 	cout << "2. Update flight schedules \n";
 	cout << "3. Search by Destination \n";
 	cout << "4. Calculate total revenue per flight \n";
@@ -20,8 +19,7 @@ int ConsoleIO::showMenu()
 	cout << "0. SAVE & EXIT \n";
 	cout << "Enter your choice : ";
 	cin >> choice;
-	while (choice < 0 || choice > 10)
-	{
+	while (choice < 0 || choice > 10) {
 		cout << "Please enter again ! : ";
 		cin >> choice;
 	}
