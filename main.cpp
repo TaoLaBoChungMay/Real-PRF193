@@ -1,11 +1,14 @@
 #include <iostream>
 #include "ConsoleIO.h"
 #include "FlightManagement.h"
+#include "ReservationManagement.h"
+
+using namespace std;
 int main(int argc, char** argv) {
 
 	ConsoleIO cIO;
 	FlightManagement FMng;
-
+	ReservationManagement SMng(FMng);
 	int choice = -1;
 	do {
 		choice =cIO.showMenu();
@@ -17,11 +20,19 @@ int main(int argc, char** argv) {
 			}
 
 			case 2 : {				// 2. Update flight schedules
+
 				break;
 			}
 
 			case 3 : {				// 3. Search by Destination
-
+				cout << "==============================================================\n";
+	cout << left
+	     << "| " << setw(8)  << "FLT ID"
+	     << "| " << setw(20) << "Destination"
+	     << "| " << setw(15) << "Departure"
+	     << "| " << setw(12) << "Ticket Price"
+	     << "|\n";
+	cout << "--------------------------------------------------------------\n";
 				break;
 			}
 
@@ -31,6 +42,7 @@ int main(int argc, char** argv) {
 			}
 
 			case 5 : {				// 5. Book a ticket
+				SMng.bookTicket();
 				break;
 			}
 

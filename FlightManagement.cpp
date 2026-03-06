@@ -4,7 +4,31 @@
 
 using namespace std;
 
-//
+void FlightManagement ::displayHeader () {
+	cout << "==============================================================\n";
+	cout << left
+	     << "| " << setw(8)  << "FLT ID"
+	     << "| " << setw(20) << "Destination"
+	     << "| " << setw(15) << "Departure"
+	     << "| " << setw(12) << "Ticket Price"
+	     << "|\n";
+	cout << "--------------------------------------------------------------\n";
+}
+
+// ========================== Hàm tìm kiếm địa điểm và trả về con trỏ cho foundFlight
+
+vector<Flight> FlightManagement::findFlightByDestination(string Des) {
+	vector <Flight> a;
+	for (auto &f : listFlight) {
+		if (f.getDestination() == Des)
+			a.push_back(f);
+	}
+
+	return a;
+}
+
+
+//==========================1. Add Flight Schedules ============================//
 void FlightManagement::addFlightSchedule() {
 
 	Flight Fl;
@@ -47,10 +71,11 @@ void FlightManagement::addFlightSchedule() {
 	}
 	FID += to_string(intID);
 	Fl.setFlightID(FID);
-	
+
 	//5. Notify add succesfully
-	
+
 	cout <<"Add successfully ! \n";
-	
+
+	listFlight.push_back(Fl);
 }
 

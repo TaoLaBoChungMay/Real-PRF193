@@ -1,7 +1,8 @@
-#include <iostream>
-
 #ifndef CONSOLEIO_H
 #define CONSOLEIO_H
+
+#include <iostream>
+
 using namespace std;
 
 class ConsoleIO {

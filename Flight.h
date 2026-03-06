@@ -1,7 +1,9 @@
-#include <iostream>
-#include <string>
 #ifndef FLIGHT_H
 #define FLIGHT_H
+
+#include <iostream>
+#include <string>
+#include <iomanip>
 
 using namespace std;
 class Flight {
@@ -50,6 +52,12 @@ class Flight {
 		void setTicketPrice (double TP) {
 			this -> TicketPrice = TP;
 		}
+
+		// Sub - method
+		
+		void displayFlight();
+		
 };
+
 
 #endif
