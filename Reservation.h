@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <vector>
-
+#include "Flight.h"
 using namespace std;
 
 class Reservation {
@@ -13,24 +13,29 @@ class Reservation {
 		string FullName;			// Min 2 words
 		string SeatClass;			// Economy = 10 / Business = 20
 
+		// Sub attribute
+		string FIDBooking;
 	public :
 		// Constructor
 		Reservation () :
-			BookingID(""), PassengerID(""), FullName(""), SeatClass("")
+			BookingID(""), PassengerID(""), FullName(""), SeatClass(""), FIDBooking("")
 		{}
 
-		// SETTER
-		void setBookingID(string BID) {
+		void setBookingID(string &BID) {
 			this->BookingID = BID;
 		}
-		void setPassengerID(string PID) {		// PASxxx
+		void setPassengerID(string &PID) {		// PASxxx
 			this->PassengerID = PID;
 		}
-		void setFullName(string FN) {
+		void setFullName(string &FN) {
 			this->FullName = FN;
 		}
-		void setSeatClass(string seatType) {
+		void setSeatClass(string &seatType) {
 			this->SeatClass = seatType;
+		}
+
+		void setFIDBooking (string &FID) {
+			this ->FIDBooking = FID;
 		}
 
 		// GETTER
@@ -46,9 +51,13 @@ class Reservation {
 		string getSeatClass() {
 			return SeatClass;
 		}
-
+		string getFIDBooking () {
+			return FIDBooking;
+		}
+		
 		// Method
 		void displayReservation();
+		void displayHeader();
 };
 
 #endif

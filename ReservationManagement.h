@@ -15,7 +15,7 @@ class FlightManagement;   // Khai báo để liên kết FlightManagement
 class ReservationManagement {
 	private :
 		vector <Reservation> listReservation;
-		FlightManagement& FMng;
+		FlightManagement& FMng;			// Chỉ nhận method từ FlightManagement
 
 	public :
 		// Construct nhận con trỏ & từ Flight
@@ -34,10 +34,11 @@ class ReservationManagement {
 		}
 
 		// GETTER
-		vector <Reservation> getlistReservation() {
+		vector <Reservation> &getlistReservation() {
 			return listReservation;
 		}
-
+		
+		// Sub- method
 };
 
 #endif

@@ -3,23 +3,45 @@
 
 #include <iostream>
 #include <vector>
-#include "FLight.h"
-
+#include "Flight.h"
+#include "ReservationManagement.h"
+class ReservationManagement;
 
 class FlightManagement {
-	private :
+	protected :
 		vector <Flight> listFlight;
 	public :
 		void addFlightSchedule ();
 		void updateFlightSchedule ();
 		void searchByDestination ();
-		void revenuePerFlight ();
-
+		void revenuePerFlight (ReservationManagement &RMng);
+		void sortFlightByPrice();
+		void searchByDepartureTime();
+		
+		// sub-attribute
+		double revenueByFID ;
+		
 		// Hàm bổ trợ cho việc tìm kiếm Destination và đặt vé
 		vector<Flight> findFlightByDestination(string Des);
-
+		bool searchFID (string fid);
+		
 		// Hàm in header
 		void displayHeader ();
+
+		// Getter
+		vector <Flight> &getListFlight (){
+			return listFlight;
+		}
+		double getRevenueByFID (){
+			return revenueByFID;
+		}
+		// Setter
+		
+		void setListFlight(vector <Flight> LF){
+			this -> listFlight = LF;
+		}
+		
+		
 };
 
 #endif

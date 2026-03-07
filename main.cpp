@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "ConsoleIO.h"
 #include "FlightManagement.h"
 #include "ReservationManagement.h"
@@ -8,7 +9,9 @@ int main(int argc, char** argv) {
 
 	ConsoleIO cIO;
 	FlightManagement FMng;
-	ReservationManagement SMng(FMng);
+	ReservationManagement RMng(FMng);
+	cIO.loadData(FMng, RMng);
+
 	int choice = -1;
 	do {
 		choice =cIO.showMenu();
@@ -20,54 +23,48 @@ int main(int argc, char** argv) {
 			}
 
 			case 2 : {				// 2. Update flight schedules
-
+				FMng.updateFlightSchedule();
 				break;
 			}
 
 			case 3 : {				// 3. Search by Destination
-				cout << "==============================================================\n";
-	cout << left
-	     << "| " << setw(8)  << "FLT ID"
-	     << "| " << setw(20) << "Destination"
-	     << "| " << setw(15) << "Departure"
-	     << "| " << setw(12) << "Ticket Price"
-	     << "|\n";
-	cout << "--------------------------------------------------------------\n";
+				FMng.searchByDestination();
 				break;
 			}
 
 			case 4 : {				// 4. Calculate total revenue per flight
-
+				FMng.revenuePerFlight (RMng);
 				break;
 			}
 
 			case 5 : {				// 5. Book a ticket
-				SMng.bookTicket();
+				RMng.bookTicket();
 				break;
 			}
 
 			case 6 : {				// 6. Cancel reservation
-
+				RMng.cancelReservation();
 				break;
 			}
 
 			case 7 : {				// 7. Display passenger lists grouped by flight
-
+				RMng.displayPassengerGroup();
 				break;
 			}
 
 			case 8 : {				// 8. Sort flights by Ticket Price (Ascending)
-
+				FMng.sortFlightByPrice();
 				break;
 			}
 
 			case 9 : {				// 9. Search by Departure Time
-
+				FMng.searchByDepartureTime();
 				break;
 			}
 
 			case 0 : {				// 0. SAVE & EXIT
 				cout <<"Thank you and SAVE before you exit ! ";
+				cIO.saveData(FMng, RMng);
 				break;
 			}
 		}

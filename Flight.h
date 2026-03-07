@@ -12,12 +12,12 @@ class Flight {
 		string Destination;
 		string DepartureTime;
 		double TicketPrice;
-
+		
+		// Sub - attribute
 	public :
 		// Constructor
 		Flight ()
-			:	FlightID (""), Destination (""), DepartureTime (""), TicketPrice (0)
-		{}
+			:	FlightID (""), Destination (""), DepartureTime (""), TicketPrice (0) {}
 
 		// Getter
 		string getFlightID () {
@@ -35,6 +35,7 @@ class Flight {
 		double getTicketPrice () {
 			return TicketPrice;
 		}
+
 		// Setter
 
 		void setFlightID (string FID) {
@@ -54,9 +55,9 @@ class Flight {
 		}
 
 		// Sub - method
-		
+
 		void displayFlight();
-		
+
 };
 
 
