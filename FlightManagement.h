@@ -23,10 +23,9 @@ class FlightManagement {
 		
 		// Hàm bổ trợ cho việc tìm kiếm Destination và đặt vé
 		vector<Flight> findFlightByDestination(string Des);
-		bool searchFID (string fid);
-		
+		Flight *findFlightByFID (string FID);
 		// Hàm in header
-		void displayHeader ();
+		void headerFlight ();
 
 		// Getter
 		vector <Flight> &getListFlight (){

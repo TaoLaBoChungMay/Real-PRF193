@@ -1,28 +1,40 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include "Flight.h"
 #include "FlightManagement.h"
 #include "ReservationManagement.h"
 
 using namespace std;
 
+void ReservationManagement::headerReservation () {
+	cout << "==========================================\n";
+	cout << left
+	     << "| " << setw(8)  << "BOOKING ID"
+	     << "| " << setw(8)  << "FLT ID"
+	     << "| " << setw(8)  << "PAS ID"
+	     << "| " << setw(20) << "FULL NAME"
+	     << "|\n";
+	cout << "-------------------------------------------\n";
+
+}
 
 //=========================== 5. Book a ticket ====================================//
 void ReservationManagement::bookTicket() {
 
 	// TH 1 : Không có chuyến bay nào trong danh sách
 	if (FMng.getListFlight().empty()) {
-		cout <<"None Flight left in List ! \n";
+		cout <<"None Flight left in List ! You will be brought back MAIN MENU \n";
 		return;
 	}
 
 	// TH 2 : Có chuyến bay trong danh sách
-	FMng.displayHeader();
+	FMng.headerFlight ();
 	for (auto &f : FMng.getListFlight()) {
 		f.displayFlight();
 	}
 
-	//1 Enter Destination
+	//1. Enter Destination
 	vector <Flight> foundFlight;
 	do {
 		cout <<"Enter destination you want to go : ";
@@ -40,7 +52,7 @@ void ReservationManagement::bookTicket() {
 
 
 	//1.2 In tất cả chuyến bay trùng địa điểm yêu cầu
-	FMng.displayHeader();
+	FMng.headerFlight ();
 	for (auto f : foundFlight) {
 		f.displayFlight();
 	}
@@ -49,16 +61,22 @@ void ReservationManagement::bookTicket() {
 
 //2. Chọn FLT ID để đặt vé
 	string FID ="";
-	cout <<"Choose FLT ID you want book : ";
-	getline(cin >> ws, FID);
+	do {
+		cout <<"Choose FLT ID you want book (FLTxxx, e.g., FLT001) : ";
+		getline(cin >> ws, FID);
+
+		if (FMng.findFlightByFID(FID) == nullptr) {
+			cout <<"Please Enter FLT ID again (FLTxxx, e.g., FLT001) \n";
+		}
+	} while (FMng.findFlightByFID(FID) == nullptr);
+
 
 //2.1 Chọn chuyến bay đã đặt
-	Flight choicedFlight;
-	for (auto &f : foundFlight) {
-		if (f.getFlightID () == FID) {
-			choicedFlight = f;
-			break;
-		}
+	Flight* choicedFlight = FMng.findFlightByFID(FID);
+
+	if (choicedFlight == nullptr) {
+		cout <<" Not exist !. You will be brought back MAIN MENU \n";
+		return;
 	}
 
 	string FN ="";
@@ -77,8 +95,8 @@ void ReservationManagement::bookTicket() {
 
 	do {
 		cout <<"Choose Seat Type (1. Economy / 2. Bussiness ) \n" ;
-		cout <<"1. Price Economy Seat : " << choicedFlight.getTicketPrice() + 10 <<"$ \n";
-		cout <<"2. Price Business Seat : " << choicedFlight.getTicketPrice() + 100 <<"$ \n";
+		cout <<"1. Price Economy Seat : " << choicedFlight->getTicketPrice() + 10 <<"$ \n";
+		cout <<"2. Price Business Seat : " << choicedFlight->getTicketPrice() + 100 <<"$ \n";
 		cin >> choice;
 
 		if (choice != 1 && choice != 2)
@@ -89,17 +107,16 @@ void ReservationManagement::bookTicket() {
 	double PriceTicket =0;	// Giá chốt đơn
 
 	if (choice == 1 ) {
-		PriceTicket = choicedFlight.getTicketPrice() + 10;
+		PriceTicket = choicedFlight->getTicketPrice() + 10;
 		seatType ="Economy";
 	}
 
 	else {
-		PriceTicket = choicedFlight.getTicketPrice() + 100;
+		PriceTicket = choicedFlight->getTicketPrice() + 100;
 		seatType ="Business";
 	}
 
-
-//5. Cập nhập BookingID và PAS ID
+	//5. Cập nhập BookingID và PAS ID
 	string BID ="BK";
 	string PID ="PAS";
 
@@ -119,7 +136,7 @@ void ReservationManagement::bookTicket() {
 	PID += to_string (ID);
 
 
-//6. Tạo object Reservation để push_back và listReservation
+	//6. Tạo object Reservation
 	Reservation r;
 
 	r.setBookingID (BID);
@@ -127,10 +144,11 @@ void ReservationManagement::bookTicket() {
 	r.setPassengerID(PID);
 	r.setSeatClass(seatType);
 	r.setFIDBooking(FID);
-//7. Đẩy vào listReservation
+
+	//7. Đẩy vào listReservation
 	listReservation.push_back(r);
 
-// 7. Print ticket
+	// 8. Print ticket
 	cout << "\n========= BOOKING SUCCESSFUL =========\n";
 	cout << "Booking ID   : " << BID << endl;
 	cout << "Passenger ID : " << PID << endl;
@@ -155,8 +173,8 @@ void ReservationManagement::cancelReservation() {
 			return;
 		}
 	}
-	
-	cout << "Reservation cancelled successfully!\n";
+
+	cout << "Booking ID " << BID << " was not found. Cancellation failed.\n";
 	return;
 }
 
@@ -168,11 +186,18 @@ void ReservationManagement :: displayPassengerGroup() {
 	cout <<"Enter FLT ID you want to check list Passenger : ";
 	getline(cin >> ws, FLTID);
 
-	for (auto &r : listReservation) {
+	bool found = false;
+	
+	for (auto &r : listReservation)
 		if (r.getFIDBooking() == FLTID) {
 			r.displayReservation();
+			found = true;
 		}
-	}
+
+	if (found == false)
+		cout << "Flight ID " << FLTID << " was not found. Display failed.\n";
+
+	return;
 }
 
 

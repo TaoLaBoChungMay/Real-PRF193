@@ -10,6 +10,7 @@ using namespace std;
 //========================= DISPLAY MENU==============//
 int ConsoleIO::showMenu() {
 	int choice = -1;
+
 	cout << "=================== MENU ====================== \n";
 	cout << "1. Add flight schedules (<= 100 Schedules) \n";
 	cout << "2. Update flight schedules \n";
@@ -21,13 +22,25 @@ int ConsoleIO::showMenu() {
 	cout << "8. Sort flights by Ticket Price (Ascending) \n";
 	cout << "9. Search by Departure Time \n";
 	cout << "0. SAVE & EXIT \n";
-	cout << "Enter your choice : ";
-	cin >> choice;
 
-	while (choice < 0 || choice > 10) {
-		cout << "Please enter again ! : ";
-		cin >> choice;
+	while (true) {
+		cout << "Enter your choice: ";
+
+		if (!(cin >> choice)) {
+			cin.clear();
+			cin.ignore(1000, '\n');		// Xoá buffer còn sót lại
+			cout << "Invalid input! Please enter a number.\n";
+			continue;
+		}
+
+		if (choice >= 0 && choice <= 9) {
+			cin.ignore(1000, '\n');
+			break;
+		}
+
+		cout << "Choice must be from 0 -> 9\n";
 	}
+
 	return choice;
 }
 
@@ -75,6 +88,12 @@ void ConsoleIO::saveData(FlightManagement &FMng, ReservationManagement &RMng) {
 void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 	ifstream inputFile ("AirFlight_PassengerReservation.txt");
 
+	// TH 1 : Mở file bị lỗi
+	if (!inputFile) {
+		cout << "No previous data file found. Starting new data.\n";
+		return;
+	}
+
 	bool isLineFlight = false;
 	bool isLineReservation = false;
 	string line ="";
@@ -105,14 +124,23 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			Flight f;
 
 			string FID, Des, Dep, sTP;
-
 			getline(ss, FID, '|');
 			getline(ss, Des, '|');
 			getline(ss, Dep, '|');
 			getline(ss, sTP);
+			//1. Trong trường hợp thiếu 1 trong các attribute
+			if (FID.empty() || Des.empty() || Dep.empty() || sTP.empty())
+				continue;
 
-			double TP = stod(sTP);
-
+			//2. Lỗi 2 : cố tình ticketPrice là nhập chuỗi ký tự
+			double TP =0;
+			try {
+				TP = stod(sTP);
+			} catch (const invalid_argument& e) {
+				cout << "Invalid number format\n";
+				continue;
+			}
+			
 			f.setFlightID(FID);
 			f.setDestination(Des);
 			f.setDepartureTime(Dep);
@@ -142,7 +170,38 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			LR.push_back(r);
 		}
 	}
+	
+	// 3. Đẩy vào listFlight và listReservation
 	FMng.setListFlight(LF);
 	RMng.setlistReservation(LR);
+	
 	inputFile.close();
+}
+
+//================== OPTIONAL : Người dùng muốn clear màn hình hay không ================= //
+
+void ConsoleIO::askClearScreen() {
+
+	char choice;
+
+	do {
+
+		cout << "\nClear screen? (Y/N): ";
+		cin >> choice;
+
+		if (choice == 'Y' || choice == 'y') {
+			system("cls");
+			break;
+		}
+
+		else if (choice == 'N' || choice == 'n') {
+			break;
+		}
+
+		else {
+			cout << "Invalid choice! Please enter Y or N.\n";
+		}
+
+	} while (true);
+
 }

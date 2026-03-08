@@ -4,7 +4,8 @@
 
 using namespace std;
 
-void FlightManagement ::displayHeader () {
+
+void FlightManagement ::headerFlight () {
 	cout << "===============================================================\n";
 	cout << left
 	     << "| " << setw(8)  << "FLT ID"
@@ -28,14 +29,12 @@ vector<Flight> FlightManagement::findFlightByDestination(string Des) {
 	return a;
 }
 
-bool FlightManagement::searchFID(string fid) {
-
+Flight* FlightManagement::findFlightByFID(string FID) {
 	for (auto &f : listFlight) {
-		if (f.getFlightID() == fid)
-			return true;
+		if (f.getFlightID() == FID)
+			return &f;
 	}
-
-	return false;
+	return nullptr;
 }
 //==========================1. Add Flight Schedules ============================//
 void FlightManagement::addFlightSchedule() {
@@ -46,13 +45,12 @@ void FlightManagement::addFlightSchedule() {
 	string Des ="";
 	cout <<"Add Destination  : ";
 	getline(cin >> ws, Des);
-	Fl.setDestination(Des);
+
 
 	//2. Enter Departure Time
 	string Dep ="";
-	cout <<"Add Departure Time : ";
+	cout << "Enter Departure Time (HH:MM, e.g., 14:30): ";
 	getline(cin >> ws, Dep);
-	Fl.setDepartureTime(Dep);
 
 
 	//3. Enter Ticket Price
@@ -60,16 +58,26 @@ void FlightManagement::addFlightSchedule() {
 	do {
 		cout <<"Add Ticket Price ( Ticket Price >= 50.00) : ";
 		cin >> TP;
+
+		if (cin.fail()) {				// Lỗi người dùng nhập ký tự
+			cin.clear();				// Xoá trạng thái lỗi
+			cin.ignore(1000,'\n');		// Xoá dữ liệu sai trong buffer
+			cout << "Invalid input! Please enter a number ! \n";
+			TP = 0;						// Reset lại giá tiền
+			continue;
+		}
+
 		if (TP < 50)
 			cout <<"Please enter Ticket Price again ! \n";
 	} while (TP < 50);
 
-	Fl.setTicketPrice(TP);
+
 
 	//4. Update FLT ID by 1
 	// Limit FLT ID = 100 Flight
 	unsigned int intID = listFlight.size() + 1;
 	string FID ="FLT"; // FLT xxx
+
 	if (listFlight.size() < 10) {
 		FID +="00";
 	} else if (listFlight.size() >=10 && listFlight.size() <=99 ) {
@@ -79,11 +87,16 @@ void FlightManagement::addFlightSchedule() {
 		return;
 	}
 	FID += to_string(intID);
-	Fl.setFlightID(FID);
+
 
 	//5. Notify add succesfully
 
 	cout <<"Add successfully ! \n";
+
+	Fl.setDestination(Des);
+	Fl.setDepartureTime(Dep);
+	Fl.setTicketPrice(TP);
+	Fl.setFlightID(FID);
 
 	listFlight.push_back(Fl);
 }
@@ -91,14 +104,20 @@ void FlightManagement::addFlightSchedule() {
 //==========================2. Update Flight Schedules ========================//
 void FlightManagement::updateFlightSchedule() {
 
+	//0. In ra các chuyến bay để chọn và sửa
+	headerFlight ();
+	for (auto &f : listFlight)
+		f.displayFlight();
+
 	//1. Nhập FlightID cần cập nhật
 	string FID;
 	cout << "Enter Flight ID to update: ";
 	getline(cin >> ws, FID);
 
 	//2. Tìm chuyến bay trong danh sách
-	for (auto &f : listFlight) {
 
+	//2. Tìm chuyến bay trong danh sách
+	for (auto &f : listFlight) {
 		if (f.getFlightID() == FID) {
 
 			//3. Nhập thông tin mới
@@ -107,7 +126,6 @@ void FlightManagement::updateFlightSchedule() {
 
 			cout << "Enter new Destination: ";
 			getline(cin >> ws, Des);
-
 			cout << "Enter new Departure Time: ";
 			getline(cin >> ws, Dep);
 
@@ -146,7 +164,7 @@ void FlightManagement::searchByDestination() {
 	}
 
 	//4. In header bảng
-	displayHeader();
+	headerFlight ();
 
 	//5. In danh sách chuyến bay tìm được
 	for (auto &f : result)
@@ -159,7 +177,10 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 	string FID = "";
 	cout <<"Enter FLTID you want to show Renevue : ";
 	getline (cin >> ws, FID);
-	if (!searchFID(FID)) {
+
+	Flight *flight = findFlightByFID(FID);
+
+	if (flight == nullptr) {
 		cout << "Flight not found!\n";
 		return;
 	}
@@ -171,41 +192,38 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 
 	for (auto &r : LR) {
 		if (r.getFIDBooking() == FID) {
-			for (auto &f : listFlight) {
-				if (f.getFlightID() == FID) {
-					if (r.getSeatClass() == "Economy")
-						revenue += f.getTicketPrice() + 10;
-					else if (r.getSeatClass() == "Business")
-						revenue += f.getTicketPrice() + 100;
-				}
-			}
+			if (r.getSeatClass() == "Economy")
+				revenue += flight->getTicketPrice() + 10;
+
+			else if (r.getSeatClass() == "Business")
+				revenue += flight->getTicketPrice() + 100;
 		}
 	}
 
 	cout << "Total revenue of " << FID << " = "
 	     << fixed << setprecision(2) << revenue << "$\n";
-
 }
-
 
 //==========================8. Sort flights by Ticket Price ============================//
 void FlightManagement::sortFlightByPrice() {
+	// 0. Khởi tạo vector chứa Flight và danh sách Flight
+	vector <Flight > sortFlight = listFlight;
 
 	//1. Sắp xếp danh sách chuyến bay theo TicketPrice tăng dần
-	for (int i = 0; i < listFlight.size() - 1; i++) {
-		for (int j = i + 1; j < listFlight.size(); j++) {
-			if (listFlight[i].getTicketPrice() > listFlight[j].getTicketPrice()) {
-				Flight temp = listFlight[i];
-				listFlight[i] = listFlight[j];
-				listFlight[j] = temp;
+	for (int i = 0; i < sortFlight.size() - 1; i++) {
+		for (int j = i + 1; j < sortFlight.size(); j++) {
+			if (sortFlight[i].getTicketPrice() > sortFlight[j].getTicketPrice()) {
+				Flight temp = sortFlight[i];
+				sortFlight[i] = sortFlight[j];
+				sortFlight[j] = temp;
 			}
 		}
 	}
 
 	//2. In danh sách chuyến bay sau khi sắp xếp
-	displayHeader();
+	headerFlight ();
 
-	for (auto &f : listFlight) {
+	for (auto &f : sortFlight) {
 		f.displayFlight();
 	}
 }
@@ -221,11 +239,10 @@ void FlightManagement::searchByDepartureTime() {
 	bool found = false;
 
 	//2. In header bảng
-	displayHeader();
+	headerFlight ();
 
 	//3. Tìm và in chuyến bay
 	for (auto &f : listFlight) {
-
 		if (f.getDepartureTime() == Dep) {
 			f.displayFlight();
 			found = true;

@@ -10,8 +10,9 @@ using namespace std;
 class ConsoleIO {
 	public :
 		int showMenu();
-		void saveData(FlightManagement &Fmng, ReservationManagement &RMng);
-		void loadData(FlightManagement &FMng, ReservationManagement &RMng);
+		void saveData (FlightManagement &Fmng, ReservationManagement &RMng);
+		void loadData (FlightManagement &FMng, ReservationManagement &RMng);
+		void askClearScreen ();
 };
 
 #endif

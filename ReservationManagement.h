@@ -39,6 +39,7 @@ class ReservationManagement {
 		}
 		
 		// Sub- method
+		void headerReservation ();
 };
 
 #endif
