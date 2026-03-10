@@ -8,14 +8,14 @@
 using namespace std;
 
 void ReservationManagement::headerReservation () {
-	cout << "==========================================\n";
+	cout << "==============================================\n";
 	cout << left
 	     << "| " << setw(8)  << "BOOKING ID"
 	     << "| " << setw(8)  << "FLT ID"
 	     << "| " << setw(8)  << "PAS ID"
-	     << "| " << setw(20) << "FULL NAME"
+	     << "| " << setw(12) << "FULL NAME"
 	     << "|\n";
-	cout << "-------------------------------------------\n";
+	cout << "----------------------------------------------\n";
 
 }
 
@@ -187,7 +187,7 @@ void ReservationManagement :: displayPassengerGroup() {
 	getline(cin >> ws, FLTID);
 
 	bool found = false;
-	
+	headerReservation ();
 	for (auto &r : listReservation)
 		if (r.getFIDBooking() == FLTID) {
 			r.displayReservation();

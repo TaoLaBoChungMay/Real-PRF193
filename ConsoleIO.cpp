@@ -128,7 +128,7 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			getline(ss, Des, '|');
 			getline(ss, Dep, '|');
 			getline(ss, sTP);
-			//1. Trong trường hợp thiếu 1 trong các attribute
+			//1. Trong trường hợp thiếu 1 trong các attribute, skip các dòng còn lại
 			if (FID.empty() || Des.empty() || Dep.empty() || sTP.empty())
 				continue;
 
@@ -137,10 +137,10 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			try {
 				TP = stod(sTP);
 			} catch (const invalid_argument& e) {
-				cout << "Invalid number format\n";
+				cout << "Invalid number format Ticket Price ! \n";
 				continue;
 			}
-			
+
 			f.setFlightID(FID);
 			f.setDestination(Des);
 			f.setDepartureTime(Dep);
@@ -161,6 +161,10 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			getline(ss, FN, '|');
 			getline(ss, seatType);
 
+			//1. Trong trường hợp thiếu 1 trong các attribute, skip các dòng còn lại
+			if (BID.empty() || FID.empty() || PID.empty() || FN.empty() || seatType.empty())
+				continue;
+
 			r.setBookingID(BID);
 			r.setFIDBooking(FID);
 			r.setPassengerID(PID);
@@ -170,11 +174,11 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			LR.push_back(r);
 		}
 	}
-	
+
 	// 3. Đẩy vào listFlight và listReservation
 	FMng.setListFlight(LF);
 	RMng.setlistReservation(LR);
-	
+
 	inputFile.close();
 }
 

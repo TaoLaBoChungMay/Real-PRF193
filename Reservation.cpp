@@ -10,6 +10,6 @@ void Reservation::displayReservation() {
 	     << "| " << setw(8) << BookingID
 	     << "| " << setw(8)  << FIDBooking
 	     << "| " << setw(8) << PassengerID
-	     << "| " << setw(20) << FullName
+	     << "| " << setw(14) << FullName
 	     << "|\n";
 }

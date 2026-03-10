@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
 	int choice = -1;
 	do {
-		choice =cIO.showMenu();
+		choice = cIO.showMenu();
 
 		switch (choice) {
 			case 1 : {				// 1. Add flight schedules

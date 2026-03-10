@@ -174,6 +174,12 @@ void FlightManagement::searchByDestination() {
 //=====================4. Calculate total revenue per flight  ===================//
 
 void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
+
+	//0. In header bảng và các chuyến bay từ FlightManagement
+	headerFlight ();
+	for(auto &f : listFlight) {
+		f.displayFlight();
+	}
 	string FID = "";
 	cout <<"Enter FLTID you want to show Renevue : ";
 	getline (cin >> ws, FID);
@@ -187,19 +193,26 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 
 	double revenue = 0;
 
-	// 1. Lấy danh sách đã đặt vé thành công
-	vector<Reservation> LR = RMng.getlistReservation();
-
-	for (auto &r : LR) {
+	// 1. Tính Doanh Thu
+	double BusRevenue = 0;
+	double EcoRevenue = 0;
+	for (auto &r : RMng.getlistReservation()) {
 		if (r.getFIDBooking() == FID) {
-			if (r.getSeatClass() == "Economy")
+			if (r.getSeatClass() == "Economy") {
 				revenue += flight->getTicketPrice() + 10;
+				EcoRevenue +=flight->getTicketPrice() + 10;
+			}
 
-			else if (r.getSeatClass() == "Business")
+
+			else if (r.getSeatClass() == "Business") {
 				revenue += flight->getTicketPrice() + 100;
+				BusRevenue +=flight->getTicketPrice() + 100;
+			}
 		}
 	}
-
+	
+	cout <<"Economy Seat Revenue : " << EcoRevenue <<"$\n";
+	cout <<"Business Seat Revenue : " << BusRevenue <<"$\n";
 	cout << "Total revenue of " << FID << " = "
 	     << fixed << setprecision(2) << revenue << "$\n";
 }
