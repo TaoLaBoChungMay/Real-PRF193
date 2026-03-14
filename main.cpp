@@ -5,7 +5,23 @@
 #include "ReservationManagement.h"
 
 using namespace std;
-int main(int argc, char** argv) {
+
+enum MenuOption {
+	SAVE_EXIT = 0,
+
+	add_Flight = 1,
+	update_Flight = 2,
+	search_Destination = 3,
+	calc_Revenue = 4,
+	display_Passengers = 5,
+	sort_FLight_by_Price = 6,
+	search_by_Departure_Time = 7,
+
+	book_Ticket = 8,
+	cancel_Reservation = 9,
+};
+
+int main () {
 
 	ConsoleIO cIO;
 	FlightManagement FMng;
@@ -17,62 +33,62 @@ int main(int argc, char** argv) {
 		choice = cIO.showMenu();
 
 		switch (choice) {
-			case 1 : {				// 1. Add flight schedules
+			case add_Flight : {				// 1. Add flight schedules
 				FMng.addFlightSchedule();
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 2 : {				// 2. Update flight schedules
+			case update_Flight : {				// 2. Update flight schedules
 				FMng.updateFlightSchedule();
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 3 : {				// 3. Search by Destination
+			case search_Destination : {				// 3. Search by Destination
 				FMng.searchByDestination();
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 4 : {				// 4. Calculate total revenue per flight
+			case calc_Revenue : {				// 4. Calculate total revenue per flight
 				FMng.revenuePerFlight (RMng);
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 5 : {				// 5. Book a ticket
-				RMng.bookTicket();
-				cIO.askClearScreen ();
-				break;
-			}
-
-			case 6 : {				// 6. Cancel reservation
-				RMng.cancelReservation();
-				cIO.askClearScreen ();
-				break;
-			}
-
-			case 7 : {				// 7. Display passenger lists grouped by flight
+			case display_Passengers : {				// 7. Display passenger lists grouped by flight
 				RMng.displayPassengerGroup();
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 8 : {				// 8. Sort flights by Ticket Price (Ascending)
+			case sort_FLight_by_Price : {				// 8. Sort flights by Ticket Price (Ascending)
 				FMng.sortFlightByPrice();
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 9 : {				// 9. Search by Departure Time
+			case search_by_Departure_Time : {				// 9. Search by Departure Time
 				FMng.searchByDepartureTime();
 				cIO.askClearScreen ();
 				break;
 			}
 
-			case 0 : {				// 0. SAVE & EXIT
-				cout <<"Thank you and SAVE before you exit ! ";
+			case book_Ticket : {				// 5. Book a ticket
+				RMng.bookTicket();
+				cIO.askClearScreen ();
+				break;
+			}
+
+			case cancel_Reservation : {				// 6. Cancel reservation
+				RMng.cancelReservation();
+				cIO.askClearScreen ();
+				break;
+			}
+
+			case SAVE_EXIT : {				// 0. SAVE & EXIT
+				cout <<"Thank you and SAVE before you exit *(^O^)* ";
 				cIO.saveData(FMng, RMng);
 				break;
 			}

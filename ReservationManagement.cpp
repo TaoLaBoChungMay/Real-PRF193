@@ -5,6 +5,21 @@
 #include "FlightManagement.h"
 #include "ReservationManagement.h"
 
+enum MenuOption {
+	SAVE_EXIT = 0,
+
+	add_Flight = 1,
+	update_Flight = 2,
+	search_Destination = 3,
+	calc_Revenue = 4,
+	display_Passengers = 5,
+	sort_FLight_by_Price = 6,
+	search_by_Departure_Time = 7,
+
+	book_Ticket = 8,
+	cancel_Reservation = 9,
+};
+
 using namespace std;
 
 void ReservationManagement::headerReservation () {
@@ -24,7 +39,7 @@ void ReservationManagement::bookTicket() {
 
 	// TH 1 : Không có chuyến bay nào trong danh sách
 	if (FMng.getListFlight().empty()) {
-		cout <<"None Flight left in List ! You will be brought back MAIN MENU \n";
+		cout <<"None Flight exist in List ! Return back MAIN MENU \n";
 		return;
 	}
 
@@ -37,7 +52,7 @@ void ReservationManagement::bookTicket() {
 	//1. Enter Destination
 	vector <Flight> foundFlight;
 	do {
-		cout <<"Enter destination you want to go : ";
+		cout <<"Enter destination you want to go ( e.g., Viet Nam ) : ";
 		string Des ="";
 		getline(cin >> ws, Des);
 
@@ -46,7 +61,7 @@ void ReservationManagement::bookTicket() {
 
 		//1.12 Trường hợp không có chuyến bay nào được tìm thấy
 		if (foundFlight.size() == 0) {
-			cout << Des << " Not Found ! \n";
+			cout << Des << " Not Found (=_=) ! \n";
 		}
 	} while (foundFlight.size() == 0);
 
@@ -60,28 +75,33 @@ void ReservationManagement::bookTicket() {
 //================== Đặt vé =========================
 
 //2. Chọn FLT ID để đặt vé
+
+	Flight* choicedFlight = nullptr;	// Khởi tạo choicedFlight ban đầu
 	string FID ="";
+
+	/*-------------------------- Lặp lại cho đến khi có choicedFlight ------------------- */
 	do {
 		cout <<"Choose FLT ID you want book (FLTxxx, e.g., FLT001) : ";
 		getline(cin >> ws, FID);
-
-		if (FMng.findFlightByFID(FID) == nullptr) {
-			cout <<"Please Enter FLT ID again (FLTxxx, e.g., FLT001) \n";
+		
+		// Kiểm tra xem ID có trùng với foundFlight không
+		for (auto f : foundFlight) {
+			if (f.getFlightID() == FID) {
+				choicedFlight = &f;
+				break;
+			}
 		}
-	} while (FMng.findFlightByFID(FID) == nullptr);
 
+		if (choicedFlight == nullptr)
+			cout <<"Please Enter FLT ID again (FLTxxx, e.g., FLT001) \n";
 
-//2.1 Chọn chuyến bay đã đặt
-	Flight* choicedFlight = FMng.findFlightByFID(FID);
+	} while (choicedFlight == nullptr);
 
-	if (choicedFlight == nullptr) {
-		cout <<" Not exist !. You will be brought back MAIN MENU \n";
-		return;
-	}
-
+	/*-------------- Nhập Thông Tin Hành Khách ------------------ */
+	
 	string FN ="";
 	do {
-		cout << "Enter Your Name (length >=2 words) ";
+		cout << "Enter Your Name (length >=2 words) : ";
 		getline(cin >> ws, FN);
 
 		if ( FN.size() < 2)
@@ -100,7 +120,7 @@ void ReservationManagement::bookTicket() {
 		cin >> choice;
 
 		if (choice != 1 && choice != 2)
-			cout << "Invalid choice. Please try again.\n";
+			cout << "Invalid choice. Please try again. (X_X) \n";
 
 	} while (choice != 1 && choice != 2);
 
@@ -164,17 +184,17 @@ void ReservationManagement::bookTicket() {
 
 void ReservationManagement::cancelReservation() {
 	string BID = "";
-	cout <<"Enter Your BookingID on your ticket (BKxxx) : ";
-
+	cout <<"Enter Your BookingID on your ticket (BKxxx, e.g : BK001) : ";
+	cin >> BID;
 	for (int i=0; i < listReservation.size(); i++) {
 		if (listReservation[i].getBookingID () == BID) {
 			listReservation.erase(listReservation.begin() + i);
-			cout << "Reservation cancelled successfully! \n";
+			cout << "Reservation cancelled successfully ! (^o^)  \n";
 			return;
 		}
 	}
 
-	cout << "Booking ID " << BID << " was not found. Cancellation failed.\n";
+	cout << "Booking ID " << BID << " was not found. Cancellation failed. (o_O) \n";
 	return;
 }
 
@@ -183,7 +203,7 @@ void ReservationManagement::cancelReservation() {
 void ReservationManagement :: displayPassengerGroup() {
 
 	string FLTID = "";
-	cout <<"Enter FLT ID you want to check list Passenger : ";
+	cout <<"Enter FLT ID you want to check list Passenger (FLTxxx, e.g., FLT001) : ";
 	getline(cin >> ws, FLTID);
 
 	bool found = false;
@@ -195,7 +215,7 @@ void ReservationManagement :: displayPassengerGroup() {
 		}
 
 	if (found == false)
-		cout << "Flight ID " << FLTID << " was not found. Display failed.\n";
+		cout << "Flight ID " << FLTID << " was not found. Display failed. (o_O) \n";
 
 	return;
 }

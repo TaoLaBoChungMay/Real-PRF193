@@ -17,7 +17,7 @@ void FlightManagement ::headerFlight () {
 
 }
 
-// ========================== Hàm tìm kiếm địa điểm và trả về con trỏ cho foundFlight ==============
+// ========================== Hàm tìm kiếm địa điểm cho foundFlight ==============
 
 vector<Flight> FlightManagement::findFlightByDestination(string Des) {
 	vector <Flight> a;
@@ -43,7 +43,7 @@ void FlightManagement::addFlightSchedule() {
 
 	//1. Enter destination
 	string Des ="";
-	cout <<"Add Destination  : ";
+	cout <<"Add Destination (e.g., Viet Nam) : ";
 	getline(cin >> ws, Des);
 
 
@@ -54,7 +54,7 @@ void FlightManagement::addFlightSchedule() {
 
 
 	//3. Enter Ticket Price
-	double TP =0;
+	double TP = 0;
 	do {
 		cout <<"Add Ticket Price ( Ticket Price >= 50.00) : ";
 		cin >> TP;
@@ -62,15 +62,14 @@ void FlightManagement::addFlightSchedule() {
 		if (cin.fail()) {				// Lỗi người dùng nhập ký tự
 			cin.clear();				// Xoá trạng thái lỗi
 			cin.ignore(1000,'\n');		// Xoá dữ liệu sai trong buffer
-			cout << "Invalid input! Please enter a number ! \n";
+			cout << "Invalid input! Please enter a number (-_-) ! \n";
 			TP = 0;						// Reset lại giá tiền
 			continue;
 		}
 
 		if (TP < 50)
-			cout <<"Please enter Ticket Price again ! \n";
+			cout <<"Please enter Ticket Price again (-_-) ! \n";
 	} while (TP < 50);
-
 
 
 	//4. Update FLT ID by 1
@@ -83,7 +82,7 @@ void FlightManagement::addFlightSchedule() {
 	} else if (listFlight.size() >=10 && listFlight.size() <=99 ) {
 		FID +="0";
 	} else {																		// Reach limit number of flights
-		cout <<"The flight has reached its maximum capacity ! \n";
+		cout <<"The flight has reached its maximum capacity ! (-_-) \n";
 		return;
 	}
 	FID += to_string(intID);
@@ -91,7 +90,7 @@ void FlightManagement::addFlightSchedule() {
 
 	//5. Notify add succesfully
 
-	cout <<"Add successfully ! \n";
+	cout <<"Add successfully *(^O^)* ! \n";
 
 	Fl.setDestination(Des);
 	Fl.setDepartureTime(Dep);
@@ -111,10 +110,9 @@ void FlightManagement::updateFlightSchedule() {
 
 	//1. Nhập FlightID cần cập nhật
 	string FID;
-	cout << "Enter Flight ID to update: ";
+	cout << "Enter Flight ID to update (FLTxxx, e.g., FLT001) : ";
 	getline(cin >> ws, FID);
 
-	//2. Tìm chuyến bay trong danh sách
 
 	//2. Tìm chuyến bay trong danh sách
 	for (auto &f : listFlight) {
@@ -122,22 +120,36 @@ void FlightManagement::updateFlightSchedule() {
 
 			//3. Nhập thông tin mới
 			string Des, Dep;
-			double TP;
+			double TP = 0;
 
-			cout << "Enter new Destination: ";
+			cout << "Enter new Destination (e.g., Viet Nam ) : ";
 			getline(cin >> ws, Des);
-			cout << "Enter new Departure Time: ";
+			cout << "Enter new Departure Time (HH:MM, e.g., 14:30 ) : ";
 			getline(cin >> ws, Dep);
 
-			cout << "Enter new Ticket Price: ";
-			cin >> TP;
+			do {
+				cout <<"Add Ticket Price ( Ticket Price >= 50.00) : ";
+				cin >> TP;
+
+				if (cin.fail()) {				// Lỗi người dùng nhập ký tự
+					cin.clear();				// Xoá trạng thái lỗi
+					cin.ignore(1000,'\n');		// Xoá dữ liệu sai trong buffer
+					cout << "Invalid input! Please enter a number ! \n";
+					TP = 0;						// Reset lại giá tiền
+					continue;
+				}
+
+				if (TP < 50)
+					cout <<"Please enter Ticket Price again ! \n";
+			} while (TP < 50);
+
 
 			//4. Cập nhật thông tin chuyến bay
 			f.setDestination(Des);
 			f.setDepartureTime(Dep);
 			f.setTicketPrice(TP);
 
-			cout << "Update successful!\n";
+			cout << "Update successful! *(^O^)* \n";
 			return;
 		}
 	}
@@ -151,7 +163,7 @@ void FlightManagement::searchByDestination() {
 
 	//1. Nhập Destination cần tìm
 	string Des;
-	cout << "Enter Destination: ";
+	cout << "Enter Destination (e.g., Viet Nam) : ";
 	getline(cin >> ws, Des);
 
 	//2. Tìm các chuyến bay có cùng Destination
@@ -159,7 +171,7 @@ void FlightManagement::searchByDestination() {
 
 	//3. Kiểm tra nếu không tìm thấy
 	if (result.empty()) {
-		cout << "No flight found!\n";
+		cout << "No flight found ! Return to MAIN MENU \n";
 		return;
 	}
 
@@ -181,13 +193,13 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 		f.displayFlight();
 	}
 	string FID = "";
-	cout <<"Enter FLTID you want to show Renevue : ";
+	cout <<"Enter FLTID you want to show Renevue (FLTxxx, e.g., FLT001 ): ";
 	getline (cin >> ws, FID);
 
 	Flight *flight = findFlightByFID(FID);
 
 	if (flight == nullptr) {
-		cout << "Flight not found!\n";
+		cout << "Flight not found ! Return to MAIN MENU (*-*) \n";
 		return;
 	}
 
@@ -210,7 +222,7 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 			}
 		}
 	}
-	
+
 	cout <<"Economy Seat Revenue : " << EcoRevenue <<"$\n";
 	cout <<"Business Seat Revenue : " << BusRevenue <<"$\n";
 	cout << "Total revenue of " << FID << " = "
@@ -246,7 +258,7 @@ void FlightManagement::searchByDepartureTime() {
 
 	//1. Nhập Departure Time cần tìm
 	string Dep;
-	cout << "Enter Departure Time: ";
+	cout << "Enter Departure Time (HH:MM, e.g., 14:30 ) : ";
 	getline(cin >> ws, Dep);
 
 	bool found = false;
@@ -264,6 +276,6 @@ void FlightManagement::searchByDepartureTime() {
 
 	//4. Nếu không tìm thấy chuyến bay
 	if (!found)
-		cout << "No flight found!\n";
+		cout << "No flight found! (=_=) \n";
 
 }
