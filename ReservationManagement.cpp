@@ -5,21 +5,6 @@
 #include "FlightManagement.h"
 #include "ReservationManagement.h"
 
-enum MenuOption {
-	SAVE_EXIT = 0,
-
-	add_Flight = 1,
-	update_Flight = 2,
-	search_Destination = 3,
-	calc_Revenue = 4,
-	display_Passengers = 5,
-	sort_FLight_by_Price = 6,
-	search_by_Departure_Time = 7,
-
-	book_Ticket = 8,
-	cancel_Reservation = 9,
-};
-
 using namespace std;
 
 void ReservationManagement::headerReservation () {
@@ -34,16 +19,17 @@ void ReservationManagement::headerReservation () {
 
 }
 
-//=========================== 5. Book a ticket ====================================//
+//=========================== Book a ticket ====================================//
 void ReservationManagement::bookTicket() {
 
-	// TH 1 : Không có chuyến bay nào trong danh sách
+	FileHelper fHelper;
+	// TH 1 : None Flight
 	if (FMng.getListFlight().empty()) {
 		cout <<"None Flight exist in List ! Return back MAIN MENU \n";
 		return;
 	}
 
-	// TH 2 : Có chuyến bay trong danh sách
+	// TH 2 : Flight has been existed
 	FMng.headerFlight ();
 	for (auto &f : FMng.getListFlight()) {
 		f.displayFlight();
@@ -52,54 +38,48 @@ void ReservationManagement::bookTicket() {
 	//1. Enter Destination
 	vector <Flight> foundFlight;
 	do {
-		cout <<"Enter destination you want to go ( e.g., Viet Nam ) : ";
-		string Des ="";
-		getline(cin >> ws, Des);
+		string Des = fHelper.readStringDestination();
 
-		//1.1 Tìm địa điểm và trả về chuyến bay cần đặt vé
+		//1.1 show Flight match Destination
 		foundFlight = FMng.findFlightByDestination(Des);
 
-		//1.12 Trường hợp không có chuyến bay nào được tìm thấy
+		//1.12 None Flight was found
 		if (foundFlight.size() == 0) {
-			cout << Des << " Not Found (=_=) ! \n";
+			cout << Des << " Not Found ! \n";
 		}
 	} while (foundFlight.size() == 0);
 
 
-	//1.2 In tất cả chuyến bay trùng địa điểm yêu cầu
+	//1.2 show all Flight matched Destination
 	FMng.headerFlight ();
 	for (auto f : foundFlight) {
 		f.displayFlight();
 	}
 
-//================== Đặt vé =========================
+//================== Booking Ticket =========================
 
-//2. Chọn FLT ID để đặt vé
-
-	Flight* choicedFlight = nullptr;	// Khởi tạo choicedFlight ban đầu
+//2. Choose FLT ID to book
 	string FID ="";
+	Flight *choicedFlight = nullptr;
 
-	/*-------------------------- Lặp lại cho đến khi có choicedFlight ------------------- */
 	do {
 		cout <<"Choose FLT ID you want book (FLTxxx, e.g., FLT001) : ";
 		getline(cin >> ws, FID);
-		
-		// Kiểm tra xem ID có trùng với foundFlight không
+
 		for (auto f : foundFlight) {
-			if (f.getFlightID() == FID) {
-				choicedFlight = &f;
+			if (f.getFlightID () == FID) {
+				choicedFlight = FMng.findFlightByFID(FID);
 				break;
 			}
 		}
 
 		if (choicedFlight == nullptr)
 			cout <<"Please Enter FLT ID again (FLTxxx, e.g., FLT001) \n";
-
 	} while (choicedFlight == nullptr);
 
-	/*-------------- Nhập Thông Tin Hành Khách ------------------ */
-	
-	string FN ="";
+
+//2.1 Choose Flight ordered
+	string FN = "";
 	do {
 		cout << "Enter Your Name (length >=2 words) : ";
 		getline(cin >> ws, FN);
@@ -109,7 +89,7 @@ void ReservationManagement::bookTicket() {
 
 	} while ( FN.size() < 2 );
 
-	//4. Chọn ghế ngồi
+//3. Seat Class
 	int choice =-1;
 	string seatType ="";
 
@@ -120,11 +100,11 @@ void ReservationManagement::bookTicket() {
 		cin >> choice;
 
 		if (choice != 1 && choice != 2)
-			cout << "Invalid choice. Please try again. (X_X) \n";
+			cout << "Invalid choice. Please try again.\n";
 
 	} while (choice != 1 && choice != 2);
 
-	double PriceTicket =0;	// Giá chốt đơn
+	double PriceTicket =0;	// Final Price
 
 	if (choice == 1 ) {
 		PriceTicket = choicedFlight->getTicketPrice() + 10;
@@ -136,7 +116,7 @@ void ReservationManagement::bookTicket() {
 		seatType ="Business";
 	}
 
-	//5. Cập nhập BookingID và PAS ID
+//5. Auto Update PAS ID and BK ID
 	string BID ="BK";
 	string PID ="PAS";
 
@@ -156,7 +136,7 @@ void ReservationManagement::bookTicket() {
 	PID += to_string (ID);
 
 
-	//6. Tạo object Reservation
+//6. Create object
 	Reservation r;
 
 	r.setBookingID (BID);
@@ -165,7 +145,6 @@ void ReservationManagement::bookTicket() {
 	r.setSeatClass(seatType);
 	r.setFIDBooking(FID);
 
-	//7. Đẩy vào listReservation
 	listReservation.push_back(r);
 
 	// 8. Print ticket
@@ -174,13 +153,14 @@ void ReservationManagement::bookTicket() {
 	cout << "Passenger ID : " << PID << endl;
 	cout << "Full Name    : " << FN << endl;
 	cout << "Flight ID    : " << FID << endl;
+	//	cout << "Destination  : " <<
 	cout << "Seat Class   : " << seatType << endl;
 	cout << "Final Price  : " << fixed << setprecision(2)
 	     << PriceTicket <<"$" << endl;
 	cout << "======================================\n";
 }
 
-//================= 6. Cancel reservation ===================//
+//================= Cancel reservation ===================//
 
 void ReservationManagement::cancelReservation() {
 	string BID = "";
@@ -189,19 +169,24 @@ void ReservationManagement::cancelReservation() {
 	for (int i=0; i < listReservation.size(); i++) {
 		if (listReservation[i].getBookingID () == BID) {
 			listReservation.erase(listReservation.begin() + i);
-			cout << "Reservation cancelled successfully ! (^o^)  \n";
+			cout << "Reservation cancelled successfully! \n";
 			return;
 		}
 	}
 
-	cout << "Booking ID " << BID << " was not found. Cancellation failed. (o_O) \n";
+	cout << "Booking ID " << BID << " was not found. Cancellation failed.\n";
 	return;
 }
 
 
-//============== 7. Display passenger lists grouped by flight =====================//
+//============== Display passenger lists grouped by flight =====================//
 void ReservationManagement :: displayPassengerGroup() {
 
+	FMng.headerFlight();
+	for (auto f : FMng.getListFlight() ) {
+		f.displayFlight();
+	}
+	
 	string FLTID = "";
 	cout <<"Enter FLT ID you want to check list Passenger (FLTxxx, e.g., FLT001) : ";
 	getline(cin >> ws, FLTID);
@@ -215,7 +200,7 @@ void ReservationManagement :: displayPassengerGroup() {
 		}
 
 	if (found == false)
-		cout << "Flight ID " << FLTID << " was not found. Display failed. (o_O) \n";
+		cout << "Flight ID " << FLTID << " was not found. Display failed.\n";
 
 	return;
 }

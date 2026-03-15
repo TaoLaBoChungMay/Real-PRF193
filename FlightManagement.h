@@ -5,6 +5,7 @@
 #include <vector>
 #include "Flight.h"
 #include "ReservationManagement.h"
+#include "FileHelper.h"
 class ReservationManagement;
 
 class FlightManagement {
@@ -21,9 +22,10 @@ class FlightManagement {
 		// sub-attribute
 		double revenueByFID ;
 		
-		// Hàm bổ trợ cho việc tìm kiếm Destination và đặt vé
+		// sub - method
 		vector<Flight> findFlightByDestination(string Des);
-		Flight *findFlightByFID (string FID);
+		Flight* findFlightByFID (string FID);
+		
 		// Hàm in header
 		void headerFlight ();
 

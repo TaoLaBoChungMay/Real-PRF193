@@ -8,11 +8,12 @@
 using namespace std;
 class Flight {
 	private :
+		// Main attribute
 		string FlightID;
 		string Destination;
 		string DepartureTime;
 		double TicketPrice;
-		
+
 		// Sub - attribute
 	public :
 		// Constructor

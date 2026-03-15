@@ -10,15 +10,15 @@
 using namespace std;
 
 
-class FlightManagement;   // Khai báo để liên kết FlightManagement
+class FlightManagement;   // Clare to link Flight
 
 class ReservationManagement {
 	private :
 		vector <Reservation> listReservation;
-		FlightManagement& FMng;			// Chỉ nhận method từ FlightManagement
+		FlightManagement& FMng;			// Can get method from FlightManagement
 
 	public :
-		// Construct nhận con trỏ & từ Flight
+		// Construct
 		ReservationManagement (FlightManagement& FMng) :
 			FMng(FMng)
 		{}

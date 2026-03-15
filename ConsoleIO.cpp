@@ -1,99 +1,156 @@
 #include <iostream>
 #include "ConsoleIO.h"
+#include "FileHelper.h"
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <string>
 
+enum MenuOption {
+	SAVE_EXIT = 0,
+
+	add_Flight = 1,
+	update_Flight = 2,
+	search_Destination = 3,
+	calc_Revenue = 4,
+	display_Passengers = 5,
+	sort_FLight_by_Price = 6,
+	search_by_Departure_Time = 7,
+
+	book_Ticket = 8,
+	cancel_Reservation = 9,
+};
+
 using namespace std;
 
-//========================= DISPLAY MENU==============//
-int ConsoleIO::showMenu() {
+//========================= SHOW MAIN MENU ==============//
+int ConsoleIO::showMainMenu() {
+
 	int choice = -1;
 
-	cout << "=================== MENU ====================== \n";
-	cout << "1. Add flight schedules (<= 100 Schedules) \n";
-	cout << "2. Update flight schedules \n";
-	cout << "3. Search by Destination \n";
-	cout << "4. Calculate total revenue  per flight \n";
-	cout << "5. Display passenger lists grouped by flight \n";
-	cout << "6. Sort flights by Ticket Price (Ascending) \n";
-	cout << "7. Search by Departure Time \n";
-	cout << "8. Book a ticket \n";
-	cout << "9. Cancel reservation \n";
-	cout << "0. SAVE & EXIT (-_-) \n";
+	cout << "=========== MAIN MENU ===========\n";
+	cout << "1. Flight Management\n";
+	cout << "2. Reservation Management\n";
+	cout << "0. Save & Exit (-_-) \n";
 
 	while (true) {
+
 		cout << "Enter your choice: ";
+		cin >> choice;
 
-		if (!(cin >> choice)) {
-			cin.clear();
-			cin.ignore(1000, '\n');		// Xoá buffer còn sót lại
-			cout << "Invalid input! Please enter a number.\n";
-			continue;
+		if (choice >= 0 && choice <= 2) {
+			return choice;
 		}
 
-		if (choice >= 0 && choice <= 9) {
-			cin.ignore(1000, '\n');
-			break;
-		}
-
-		cout << "Choice must be from 0 -> 9\n";
+		cout << "Choice must be from 0 -> 2\n";
 	}
-
 	return choice;
 }
 
+int ConsoleIO::showFlightMenu() {
+	FileHelper fHelper;
+	int choice = -1;
 
-//======================= Truyền list danh sách vào file TXT để lưu file ======================//
+	cout << "------------ FLIGHT MANAGEMENT MENU ------------- \n";
+	cout << "1. Add flight schedules (<= 100 Schedules) \n";
+	cout << "2. Update flight schedules \n";
+	cout << "3. Search by Destination \n";
+	cout << "4. Calculate total revenue per flight \n";
+	cout << "5. Display passenger lists grouped by flight \n";
+	cout << "6. Sort flights by Ticket Price (Ascending) \n";
+	cout << "7. Search by Departure Time \n";
+	cout << "0. BACK MAIN MENU *(^O^)* \n";
+
+	choice = fHelper.readIntChoice(0,9);
+
+	// Return choice
+	if (choice == add_Flight || choice == update_Flight || choice == search_Destination || choice == calc_Revenue||
+	        choice == display_Passengers || choice == sort_FLight_by_Price || choice == search_by_Departure_Time || choice == SAVE_EXIT)
+		return choice;
+
+	return 0;
+}
+int ConsoleIO::showReservationMenu() {
+
+	FileHelper fHelper;
+	int choice = -1;
+
+	cout << "------------ RESERVATION MANAGEMENT MENU ------------- \n";
+	cout << "1. Book a ticket \n";
+	cout << "2. Cancel reservation \n";
+	cout << "0. BACK MAIN MENU \n";
+
+	choice = fHelper.readIntChoice(0,2);
+
+	if (choice == 0)
+		return 0;
+	if (choice == 1)
+		return book_Ticket;
+	if (choice == 2)
+		return cancel_Reservation;
+
+	return -1;
+
+}
+
+//======================= save file from FMng and RMng ======================//
 void ConsoleIO::saveData(FlightManagement &FMng, ReservationManagement &RMng) {
 
-	//0. Khởi tạo tên File cần lưu
-	ofstream outputFile ("AirFlight_PassengerReservation.txt");
+	//0. Init File
+	ofstream outputFlightFile ("Flight.txt");
+	ofstream outputReservationFile ("Reservation.txt");
 
-	if (!outputFile) {
+	if (!outputFlightFile) {
 		cout << "Cannot open file!\n";
 		return;
 	}
-	//1. Nhận cách list từ FlightManagement và ReservationManagement
+	if (!outputReservationFile) {
+		cout << "Cannot open file!\n";
+		return;
+	}
+	//1. get list from FlightManagement and ReservationManagement
 	vector <Flight> LF = FMng.getListFlight();
 	vector <Reservation> LR = RMng.getlistReservation();
 
-	//2. Lưu dữ liệu vào file
+	//---------------2. Write data on file ---------------
 
-	//2.1 Đưa listFlight vào
-	outputFile <<"[FLIGHT]" << "\n";
+	//2.1 Adding listFlight
+	outputFlightFile <<"[FLIGHT]" << "\n";
 	for (auto &f : LF) {
-		outputFile << f.getFlightID () <<"|"
-		           << f.getDestination () <<"|"
-		           << f.getDepartureTime () <<"|"
-		           << f.getTicketPrice () << "\n";
+		outputFlightFile << f.getFlightID () <<"|"
+		                 << f.getDestination () <<"|"
+		                 << f.getDepartureTime () <<"|"
+		                 << f.getTicketPrice () << "\n";
 	}
 
-	//2.2 Đưa listReservation vào
-	outputFile <<"[RESERVATION]" << "\n";
+	//2.2 Adding listReservation
+	outputReservationFile <<"[RESERVATION]" << "\n";
 	for (auto &r : LR) {
-		outputFile << r.getBookingID() <<"|"
-		           << r.getFIDBooking() <<"|"
-		           << r.getPassengerID() <<"|"
-		           << r.getFullName()  <<"|"
-		           << r.getSeatClass() << "\n";
+		outputReservationFile << r.getBookingID() <<"|"
+		                      << r.getFIDBooking() <<"|"
+		                      << r.getPassengerID() <<"|"
+		                      << r.getFullName()  <<"|"
+		                      << r.getSeatClass() << "\n";
 	}
 
-	//3. Đóng File
-	outputFile.close();
+	//3. Close File
+	outputFlightFile.close();
+	outputReservationFile.close();
 }
 
-//======================== Đọc dữ liệu từ File để bắt đầu chỉnh sửa =========================== //
+//======================== Read file and push on listFlight and listReservation  =========================== //
 void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
-	ifstream inputFile ("AirFlight_PassengerReservation.txt");
-
-	// TH 1 : Mở file bị lỗi
-	if (!inputFile) {
-		cout << "No previous data file found. Starting new data.\n";
+	ifstream inputFlightFile ("Flight.txt");
+	ifstream inputReservationFile ("Reservation.txt");
+	// Case 1 : Error open File
+	if (!inputFlightFile) {
+		cout << "No previous Flight.txt data file found (-_-) . Starting new data.\n";
 		return;
 	}
-
+	if (!inputReservationFile) {
+		cout << "No previous Reservation.txt data file found (-_-) . Starting new data.\n";
+		return;
+	}
 	bool isLineFlight = false;
 	bool isLineReservation = false;
 	string line ="";
@@ -101,19 +158,14 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 	vector <Flight > LF;
 	vector <Reservation> LR;
 
-	while (getline(inputFile, line)) {
+	// Read File from Flight.txt
+	while (getline(inputFlightFile, line)) {
 
 		if(line.empty()) continue;
 
 		if (line == "[FLIGHT]") {
 			isLineFlight = true;
 			isLineReservation = false;
-			continue;
-		}
-
-		if (line == "[RESERVATION]") {
-			isLineReservation = true;
-			isLineFlight = false;
 			continue;
 		}
 
@@ -128,11 +180,11 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			getline(ss, Des, '|');
 			getline(ss, Dep, '|');
 			getline(ss, sTP);
-			//1. Trong trường hợp thiếu 1 trong các attribute, skip các dòng còn lại
+			//1. Lack of one of attribute Flight, thus skip
 			if (FID.empty() || Des.empty() || Dep.empty() || sTP.empty())
 				continue;
 
-			//2. Lỗi 2 : cố tình ticketPrice là nhập chuỗi ký tự
+			//2. Error 2 : ticketPrice is string / char
 			double TP =0;
 			try {
 				TP = stod(sTP);
@@ -149,6 +201,21 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			LF.push_back(f);
 		}
 
+	}
+
+
+// Read File from Reservation.txt
+	while (getline(inputReservationFile, line)) {
+
+		if(line.empty()) continue;
+		if (line == "[RESERVATION]") {
+			isLineReservation = true;
+			isLineFlight = false;
+			continue;
+		}
+
+		stringstream ss(line);
+
 		if (isLineReservation) {
 
 			Reservation r;
@@ -161,7 +228,7 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 			getline(ss, FN, '|');
 			getline(ss, seatType);
 
-			//1. Trong trường hợp thiếu 1 trong các attribute, skip các dòng còn lại
+			//1. Lack 1 over 5 atrribute, thus skip
 			if (BID.empty() || FID.empty() || PID.empty() || FN.empty() || seatType.empty())
 				continue;
 
@@ -175,14 +242,17 @@ void ConsoleIO::loadData(FlightManagement &FMng, ReservationManagement &RMng) {
 		}
 	}
 
-	// 3. Đẩy vào listFlight và listReservation
+	// 3. Pushing on listFlight and listReservation
 	FMng.setListFlight(LF);
 	RMng.setlistReservation(LR);
 
-	inputFile.close();
+	//4. close File
+	inputFlightFile.close();
+	inputReservationFile.close();
+
 }
 
-//================== OPTIONAL : Người dùng muốn clear màn hình hay không ================= //
+//================== OPTIONAL : Wether clear ================= //
 
 void ConsoleIO::askClearScreen() {
 
