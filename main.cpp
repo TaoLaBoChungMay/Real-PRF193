@@ -3,20 +3,21 @@
 #include "ConsoleIO.h"
 #include "FlightManagement.h"
 #include "ReservationManagement.h"
-
+#include "FileHelper.h"
 enum MenuOption {
 	SAVE_EXIT = 0,
 
 	add_Flight = 1,
-	update_Flight = 2,
-	search_Destination = 3,
-	calc_Revenue = 4,
-	display_Passengers = 5,
-	sort_FLight_by_Price = 6,
-	search_by_Departure_Time = 7,
+	delete_Flight,
+	update_Flight,
+	search_Destination,
+	calc_Revenue,
+	display_Passengers,
+	sort_FLight_by_Price,
+	search_by_Departure_Time,
 
-	book_Ticket = 8,
-	cancel_Reservation = 9,
+	book_Ticket,
+	cancel_Reservation
 };
 
 
@@ -24,9 +25,10 @@ using namespace std;
 int main(int argc, char** argv) {
 
 	ConsoleIO cIO;
+	FileHelper fHelper;
 	FlightManagement FMng;
 	ReservationManagement RMng(FMng);
-	cIO.loadData(FMng, RMng);
+	fHelper.loadData(FMng, RMng);
 
 	int MenuChoice = -1;
 	int subFlightChoice =-1;
@@ -43,14 +45,18 @@ int main(int argc, char** argv) {
 				do {
 
 					subFlightChoice = cIO.showFlightMenu();
-					
+
 					switch (subFlightChoice) {
 
 						case add_Flight:
 							FMng.addFlightSchedule();
 							cIO.askClearScreen();
 							break;
-
+						case delete_Flight: {
+							FMng.deleteFlightSchedule();
+							cIO.askClearScreen();
+							break;
+						}
 						case update_Flight:
 							FMng.updateFlightSchedule();
 							cIO.askClearScreen();
@@ -90,9 +96,7 @@ int main(int argc, char** argv) {
 
 			//===================== RESERVATION MANAGEMENT =================//
 			case 2: {
-
 				do {
-
 					subReservationChoice = cIO.showReservationMenu();
 
 					switch (subReservationChoice) {
@@ -106,9 +110,7 @@ int main(int argc, char** argv) {
 							RMng.cancelReservation();
 							cIO.askClearScreen();
 							break;
-
 					}
-
 				} while (subReservationChoice != 0);
 
 				break;
@@ -117,7 +119,7 @@ int main(int argc, char** argv) {
 			//===================== SAVE & EXIT =================//
 			case SAVE_EXIT:
 				cout << "Thank you and SAVE before you exit *(^O^)*";
-				cIO.saveData(FMng, RMng);
+				fHelper.saveData(FMng, RMng);
 				break;
 		}
 

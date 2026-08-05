@@ -7,57 +7,39 @@
 using namespace std;
 
 class Reservation {
-	private :
+	private:
 		string BookingID;
-		string PassengerID;			// PASxxx
-		string FullName;			// Min 2 words
-		string SeatClass;			// Economy = 10 / Business = 20
-
-		// Sub attribute
+		string PassengerID;
+		string FullName;
+		string SeatClass;
 		string FIDBooking;
-	public :
+		// Sub - attribute
+		string Destination;
+	public:
 		// Constructor
-		Reservation () :
-			BookingID(""), PassengerID(""), FullName(""), SeatClass(""), FIDBooking("")
-		{}
+		Reservation();
 
-		void setBookingID(string &BID) {
-			this->BookingID = BID;
-		}
-		void setPassengerID(string &PID) {		// PASxxx
-			this->PassengerID = PID;
-		}
-		void setFullName(string &FN) {
-			this->FullName = FN;
-		}
-		void setSeatClass(string &seatType) {
-			this->SeatClass = seatType;
-		}
-
-		void setFIDBooking (string &FID) {
-			this ->FIDBooking = FID;
-		}
-
-		// GETTER
-		string getBookingID () {
-			return BookingID;
-		}
-		string getPassengerID () {
-			return PassengerID;
-		}
-		string getFullName() {
-			return FullName;
-		}
-		string getSeatClass() {
-			return SeatClass;
-		}
-		string getFIDBooking () {
-			return FIDBooking;
-		}
-		
+		// Setter
+		void setBookingID(string &BID);
+		void setPassengerID(string &PID);
+		void setFullName(string &FN);
+		void setSeatClass(string &seatType);
+		void setFIDBooking(string &FID);
+		void setDestination(string &Des);
+		// Getter
+		string getBookingID() const;
+		string getPassengerID() const;
+		string getFullName() const;
+		string getSeatClass() const ;
+		string getFIDBooking()const ;
+		string getDestination() const;
 		// Method
-		void displayReservation();
-		void displayHeader();
+		void displayReservation() const;
+		void displayHeader() const;
+		void displayTicket() const;
+
+		// Sub-Method
+		
 };
 
 #endif

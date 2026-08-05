@@ -4,25 +4,63 @@
 #include "Flight.h"
 #include "FlightManagement.h"
 #include "ReservationManagement.h"
-
+#include "HelperReservation.h"
+#include "HelperFlight.h"
 using namespace std;
 
 void ReservationManagement::headerReservation () {
-	cout << "==============================================\n";
+	cout << "===========================================================\n";
 	cout << left
 	     << "| " << setw(8)  << "BOOKING ID"
 	     << "| " << setw(8)  << "FLT ID"
 	     << "| " << setw(8)  << "PAS ID"
+	     << "| " << setw(9) <<  "DESTINATION"
 	     << "| " << setw(12) << "FULL NAME"
 	     << "|\n";
-	cout << "----------------------------------------------\n";
+	cout << "-----------------------------------------------------------\n";
 
 }
 
-//=========================== Book a ticket ====================================//
+// SETTER
+void ReservationManagement::setlistReservation(const vector<Reservation>& lR) {
+	this->listReservation = lR;
+}
+
+// GETTER
+const vector<Reservation>& ReservationManagement::getlistReservation() const {
+	return listReservation;
+}
+
+//==================== UPDATE ID FOR PID AND BID ==========//
+void ReservationManagement::updateNextIDFromData() {
+	int maxBID = 0;
+	int maxPID = 0;
+	for (const auto &r : listReservation) {
+		string BID = r.getBookingID(); // FLT001
+		string PID = r.getPassengerID();
+		if (BID.length() > 3) {
+			int num = stoi(BID.substr(3));
+			if (num > maxBID) {
+				maxBID = num;
+			}
+		}
+		if (PID.length() > 3) {
+			int num = stoi(PID.substr(3));
+			if (num > maxPID) {
+				maxPID = num;
+			}
+		}
+	}
+
+	NextPID = maxPID;
+	NextBID = maxBID;
+}
+//--------------------------------------------------------------------------------//
+//=========================== 8.Book a ticket ====================================//
 void ReservationManagement::bookTicket() {
 
-	FileHelper fHelper;
+	HelperReservation hr;
+	HelperFlight hf;
 	// TH 1 : None Flight
 	if (FMng.getListFlight().empty()) {
 		cout <<"None Flight exist in List ! Return back MAIN MENU \n";
@@ -38,7 +76,7 @@ void ReservationManagement::bookTicket() {
 	//1. Enter Destination
 	vector <Flight> foundFlight;
 	do {
-		string Des = fHelper.readStringDestination();
+		string Des = hf.readStringDestination();
 
 		//1.1 show Flight match Destination
 		foundFlight = FMng.findFlightByDestination(Des);
@@ -56,19 +94,21 @@ void ReservationManagement::bookTicket() {
 		f.displayFlight();
 	}
 
-//================== Booking Ticket =========================
 
 //2. Choose FLT ID to book
 	string FID ="";
+	string Des ="";
 	Flight *choicedFlight = nullptr;
 
 	do {
-		cout <<"Choose FLT ID you want book (FLTxxx, e.g., FLT001) : ";
-		getline(cin >> ws, FID);
+		cout <<"Choose FLT ID you want book (FLTxxx, e.g., FLT001) \n ";
+		FID = hf.readStringFID();
 
 		for (auto f : foundFlight) {
+			//2.1 Choose Flight ordered
 			if (f.getFlightID () == FID) {
 				choicedFlight = FMng.findFlightByFID(FID);
+				Des = f.getDestination();
 				break;
 			}
 		}
@@ -77,73 +117,36 @@ void ReservationManagement::bookTicket() {
 			cout <<"Please Enter FLT ID again (FLTxxx, e.g., FLT001) \n";
 	} while (choicedFlight == nullptr);
 
+	//2.2 Enter Name
+	string FN = hr.readFullName();
 
-//2.1 Choose Flight ordered
-	string FN = "";
-	do {
-		cout << "Enter Your Name (length >=2 words) : ";
-		getline(cin >> ws, FN);
+	//3. Seat Class
+	double Price = choicedFlight->getTicketPrice();
+	string seatType = hr.readSeatType (Price);
 
-		if ( FN.size() < 2)
-			cout << "Please Enter Your Name Again ! \n";
-
-	} while ( FN.size() < 2 );
-
-//3. Seat Class
-	int choice =-1;
-	string seatType ="";
-
-	do {
-		cout <<"Choose Seat Type (1. Economy / 2. Bussiness ) \n" ;
-		cout <<"1. Price Economy Seat : " << choicedFlight->getTicketPrice() + 10 <<"$ \n";
-		cout <<"2. Price Business Seat : " << choicedFlight->getTicketPrice() + 100 <<"$ \n";
-		cin >> choice;
-
-		if (choice != 1 && choice != 2)
-			cout << "Invalid choice. Please try again.\n";
-
-	} while (choice != 1 && choice != 2);
-
+	//4. Calc Revenue
 	double PriceTicket =0;	// Final Price
-
-	if (choice == 1 ) {
+	if (seatType == "Economy") {
 		PriceTicket = choicedFlight->getTicketPrice() + 10;
-		seatType ="Economy";
-	}
-
-	else {
+	} else if (seatType == "Business") {
 		PriceTicket = choicedFlight->getTicketPrice() + 100;
-		seatType ="Business";
 	}
 
 //5. Auto Update PAS ID and BK ID
-	string BID ="BK";
-	string PID ="PAS";
-
-	unsigned int ID = listReservation.size() + 1;
-
-	if (listReservation.size() < 10) {
-		BID +="00";
-		PID +="00";
-	} else if (listReservation.size() >=10 && listReservation.size() <=99 ) {
-		BID +="0";
-		PID +="0";
-	} else { // Reach limit number of flights  ( 100 ticket)
-		cout <<"The quantity of ticket has reached its maximum capacity ! \n";
-		return;
-	}
-	BID += to_string (ID);
-	PID += to_string (ID);
-
+	NextPID++;
+	NextBID++;
+	string BID ="BK" + hr.updateID(NextPID);
+	string PID ="PAS" + hr.updateID(NextBID);
 
 //6. Create object
 	Reservation r;
 
 	r.setBookingID (BID);
-	r.setFullName (FN);
 	r.setPassengerID(PID);
-	r.setSeatClass(seatType);
 	r.setFIDBooking(FID);
+	r.setDestination(Des);
+	r.setFullName (FN);
+	r.setSeatClass(seatType);
 
 	listReservation.push_back(r);
 
@@ -151,21 +154,28 @@ void ReservationManagement::bookTicket() {
 	cout << "\n========= BOOKING SUCCESSFUL =========\n";
 	cout << "Booking ID   : " << BID << endl;
 	cout << "Passenger ID : " << PID << endl;
-	cout << "Full Name    : " << FN << endl;
+	cout << "Full Name    : " << FN  << endl;
 	cout << "Flight ID    : " << FID << endl;
-	//	cout << "Destination  : " <<
+	cout << "Destination  : " << Des << endl;
 	cout << "Seat Class   : " << seatType << endl;
 	cout << "Final Price  : " << fixed << setprecision(2)
 	     << PriceTicket <<"$" << endl;
 	cout << "======================================\n";
 }
 
-//================= Cancel reservation ===================//
+//================= 9.Cancel reservation ===================//
 
 void ReservationManagement::cancelReservation() {
-	string BID = "";
-	cout <<"Enter Your BookingID on your ticket (BKxxx, e.g : BK001) : ";
-	cin >> BID;
+	HelperReservation hr;
+	// Display Booking for user
+	headerReservation();
+	for (auto r : listReservation)
+		r.displayReservation();
+
+	// Processing cancel Book Ticket
+	cout <<"Enter Your BookingID on your ticket (BKxxx, e.g : BK001) : \n";
+	string BID = hr.readStringBID();
+
 	for (int i=0; i < listReservation.size(); i++) {
 		if (listReservation[i].getBookingID () == BID) {
 			listReservation.erase(listReservation.begin() + i);
@@ -179,28 +189,30 @@ void ReservationManagement::cancelReservation() {
 }
 
 
-//============== Display passenger lists grouped by flight =====================//
+//============== 5.Display passenger lists grouped by flight =====================//
 void ReservationManagement :: displayPassengerGroup() {
-
+	HelperReservation hr;
+	HelperFlight hf;
 	FMng.headerFlight();
+
 	for (auto f : FMng.getListFlight() ) {
 		f.displayFlight();
 	}
-	
-	string FLTID = "";
-	cout <<"Enter FLT ID you want to check list Passenger (FLTxxx, e.g., FLT001) : ";
-	getline(cin >> ws, FLTID);
+
+	string FID = "";
+	cout <<"Enter FLT ID you want to check list Passenger (FLTxxx, e.g., FLT001) \n ";
+	FID = hf.readStringFID();
 
 	bool found = false;
 	headerReservation ();
 	for (auto &r : listReservation)
-		if (r.getFIDBooking() == FLTID) {
+		if (r.getFIDBooking() == FID) {
 			r.displayReservation();
 			found = true;
 		}
 
 	if (found == false)
-		cout << "Flight ID " << FLTID << " was not found. Display failed.\n";
+		cout << "Flight ID " << FID << " was not found. Display failed.\n";
 
 	return;
 }

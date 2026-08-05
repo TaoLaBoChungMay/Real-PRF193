@@ -3,63 +3,34 @@
 
 #include <iostream>
 #include <string>
-#include <iomanip>
 
 using namespace std;
+
 class Flight {
-	private :
-		// Main attribute
+	private:
 		string FlightID;
 		string Destination;
 		string DepartureTime;
 		double TicketPrice;
 
-		// Sub - attribute
-	public :
+	public:
 		// Constructor
-		Flight ()
-			:	FlightID (""), Destination (""), DepartureTime (""), TicketPrice (0) {}
+		Flight();
 
 		// Getter
-		string getFlightID () {
-			return FlightID;
-		}
-
-		string getDestination () {
-			return Destination;
-		}
-
-		string getDepartureTime () {
-			return DepartureTime;
-		}
-
-		double getTicketPrice () {
-			return TicketPrice;
-		}
+		string getFlightID() const;
+		string getDestination() const;
+		string getDepartureTime() const;
+		double getTicketPrice() const;
 
 		// Setter
+		void setFlightID(string FID);
+		void setDestination(string Des);
+		void setDepartureTime(string Dep);
+		void setTicketPrice(double TP);
 
-		void setFlightID (string FID) {
-			this -> FlightID = FID;
-		}
-
-		void setDestination (string Des) {
-			this -> Destination = Des;
-		}
-
-		void setDepartureTime (string Dep) {
-			this -> DepartureTime = Dep;
-		}
-
-		void setTicketPrice (double TP) {
-			this -> TicketPrice = TP;
-		}
-
-		// Sub - method
-
-		void displayFlight();
-
+		// Method
+		void displayFlight() const;
 };
-
 
 #endif

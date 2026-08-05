@@ -2,11 +2,13 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <iomanip>
 #include "FlightManagement.h"
+#include "HelperFlight.h"
 
 using namespace std;
 
-
+//--------------- Function to display headerFlight
 void FlightManagement ::headerFlight () {
 	cout << "===============================================================\n";
 	cout << left
@@ -19,6 +21,16 @@ void FlightManagement ::headerFlight () {
 
 }
 
+// Getter
+const vector<Flight>& FlightManagement::getListFlight() const {
+	return listFlight;
+}
+
+// Setter
+void FlightManagement::setListFlight(vector<Flight>& LF) {
+	this ->listFlight = LF;
+}
+
 // ===================== Fuction for Find by Destination ==============
 
 vector<Flight> FlightManagement::findFlightByDestination(string Des) {
@@ -27,40 +39,65 @@ vector<Flight> FlightManagement::findFlightByDestination(string Des) {
 		if (f.getDestination() == Des)
 			a.push_back(f);
 	}
-
 	return a;
 }
 
-Flight* FlightManagement::findFlightByFID(string FID) {
+//================ Function for Find Flight by FID==================//
+Flight* FlightManagement::findFlightByFID(const string& FID) {
 	for (auto &f : listFlight) {
 		if (f.getFlightID() == FID)
 			return &f;
 	}
 	return nullptr;
 }
+
+//============== Function find Flight Iterator by FID ===============//
+vector<Flight>::iterator FlightManagement::findItByFID(const string& FID) {
+	for (auto it = listFlight.begin(); it != listFlight.end(); ++it) {
+		if (it->getFlightID() == FID) {
+			return it;
+		}
+	}
+	return listFlight.end(); // Not found
+}
+
+//=============== FUNCTION for updateID ==================//
+void FlightManagement::updateNextIDFromData() {
+    int maxID = 0;
+
+    for (const auto &f : listFlight) {
+        string FID = f.getFlightID(); // FLT001
+
+        if (FID.length() > 3) {
+            int num = stoi(FID.substr(3));
+            if (num > maxID) {
+                maxID = num;
+            }
+        }
+    }
+
+    NextFID = maxID;
+}
 //==========================1. Add Flight Schedules ============================//
 void FlightManagement::addFlightSchedule() {
 
 	Flight Fl;
-	FileHelper fHelper;
+	HelperFlight hf;
 	//1. Enter destination
-	string Des = fHelper.readStringDestination();
+	string Des = hf.readStringDestination();
 	//2. Enter Departure Time
-	string Dep = fHelper.readStringDepartureTime();
+	string Dep = hf.readStringDepartureTime();
 
 	//3. Enter Ticket Price
-	double TP = fHelper.readDoubleTicketPrice();
+	double TP = hf.readDoubleTicketPrice();
 
 	//4. Update FLT ID by 1
 	// Limit FLT ID = 100 Flight
-	unsigned int sizeListFlight = listFlight.size() + 1;
-	string FID = fHelper.updateFlightID(sizeListFlight);
-	if (FID =="") {
-		return;
-	}
+	NextFID++;
+	string FID = "FLT" + hf.updateID(NextFID);
+
 
 	//5. Notify add succesfully
-
 	cout <<"Add successfully *(^O^)* ! \n";
 
 	Fl.setDestination(Des);
@@ -70,52 +107,97 @@ void FlightManagement::addFlightSchedule() {
 
 	listFlight.push_back(Fl);
 }
+//----------------- 2. DELETE FLIGHT SCHEDULE -----------------//
+void FlightManagement::deleteFlightSchedule() {
+	HelperFlight hf;
 
-//==========================2. Update Flight Schedules ========================//
-void FlightManagement::updateFlightSchedule() {
-	FileHelper fHelper;
-
-	//0. Show Flight to adjust
-	headerFlight ();
+	// 0. Print list Flight
+	headerFlight();
 	for (auto &f : listFlight)
 		f.displayFlight();
 
-	//1. Enter FlightID need update
 	string FID;
-	cout << "Enter Flight ID to update (FLTxxx, e.g., FLT001) : ";
-	getline(cin >> ws, FID);
+	vector<Flight>::iterator it;
 
+	while (true) {
+		cout << "Enter Flight ID to DELETE (FLTxxx, e.g., FLT001) \n";
+		FID = hf.readStringFID();
 
-	//2. Find Flight in listFlight
-	for (auto &f : listFlight) {
-		if (f.getFlightID() == FID) {
+		it = findItByFID(FID);
 
-			//3. Adjust new infor
-			string Des = fHelper.readStringDestination();
-			string Dep = fHelper.readStringDepartureTime();
-			double TP = fHelper.readDoubleTicketPrice();
-
-			//4. update new infor
-			f.setDestination(Des);
-			f.setDepartureTime(Dep);
-			f.setTicketPrice(TP);
-
-			cout << "Update successful! *(^O^)* \n";
-			return;
+		if (it != listFlight.end()) {
+			break; // Found flight - > break loop
+		} else {
+			cout << "Flight " << FID << " not found! Please try again.\n";
 		}
 	}
 
-	//5. None Flight exist in listFLight
-	cout << "Flight not found!\n";
+	// 2. Verify Delete
+	cout << "Are you sure DELETE " << FID << " ?\n";
+	cout << "Enter your choice (Y/N): ";
+
+	string option;
+	cin >> option;
+
+	if (option == "Y" || option == "y") {
+		listFlight.erase(it);
+		cout << "Deleted successfully!\n";
+
+		// 3. Print after processing
+		headerFlight();
+		for (auto &f : listFlight)
+			f.displayFlight();
+
+	} else {
+		cout << "Delete cancelled. Return to MAIN MENU.\n";
+		return;
+	}
 }
 
-//==========================3. Search by Destination ==========================//
+//==========================3. Update Flight Schedules ========================//
+void FlightManagement::updateFlightSchedule() {
+	HelperFlight hf;	// Suppoter help read input safety for listFlight
+
+	//0. Show Flight to adjust
+	headerFlight ();
+	for (const auto &f : listFlight)
+		f.displayFlight();
+
+	//1. Enter FlightID need update
+
+	cout << "Enter Flight ID to update (FLTxxx, e.g., FLT001) \n";
+	string FID = hf.readStringFID();
+
+	//2. Find Flight in listFlight
+	Flight* f = findFlightByFID(FID);
+
+	if (f == nullptr) {
+		cout <<"! No exist Flight " << FID <<" !";
+		return;
+	}
+
+	//3. Adjust new infor
+	string Des = hf.readStringDestination();
+	string Dep = hf.readStringDepartureTime();
+	double TP = hf.readDoubleTicketPrice();
+
+	//4. Update new infor
+	f->setDestination(Des);
+	f->setDepartureTime(Dep);
+	f->setTicketPrice(TP);
+
+	cout << "Update successful! *(^O^)* \n";
+	return;
+
+}
+
+//==========================4. Search by Destination ==========================//
 void FlightManagement::searchByDestination() {
 
-	FileHelper fHelper;
+	HelperFlight hf;
 	//1. Enter Destination need to find
-	string Des = fHelper.readStringDestination();
-	
+	string Des = hf.readStringDestination();
+
 	//2. Finding Flight same Destination
 	vector<Flight> result = findFlightByDestination(Des);
 
@@ -136,21 +218,21 @@ void FlightManagement::searchByDestination() {
 //=====================4. Calculate total revenue per flight  ===================//
 
 void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
-
+	HelperFlight hf;
 	//0. Print Header and show all Flight from listFlight
 	headerFlight ();
-	for(auto &f : listFlight) {
+	for(const auto &f : listFlight) {
 		f.displayFlight();
 	}
 
-	string FID = "";
-	cout <<"Enter FLTID you want to show Renevue (FLTxxx, e.g., FLT001 ): ";
-	getline (cin >> ws, FID);
 
-	Flight *flight = findFlightByFID(FID);
+	cout <<"Enter FLTID you want to show Renevue (FLTxxx, e.g., FLT001 ): \n";
+	string FID = hf.readStringFID();
 
-	if (flight == nullptr) {
-		cout << "Flight not found!\n";
+	Flight *f = findFlightByFID(FID);
+
+	if (f == nullptr) {
+		cout << "Flight " << FID << " not found!\n";
 		return;
 	}
 
@@ -159,17 +241,17 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 	// 1. Calc Revenue
 	double BusRevenue = 0;
 	double EcoRevenue = 0;
-	for (auto &r : RMng.getlistReservation()) {
+
+	for (const auto &r : RMng.getlistReservation()) {
 		if (r.getFIDBooking() == FID) {
 			if (r.getSeatClass() == "Economy") {
-				revenue += flight->getTicketPrice() + 10;
-				EcoRevenue +=flight->getTicketPrice() + 10;
+				revenue += f->getTicketPrice() + 10;
+				EcoRevenue +=f->getTicketPrice() + 10;
 			}
 
-
 			else if (r.getSeatClass() == "Business") {
-				revenue += flight->getTicketPrice() + 100;
-				BusRevenue +=flight->getTicketPrice() + 100;
+				revenue += f->getTicketPrice() + 100;
+				BusRevenue +=f->getTicketPrice() + 100;
 			}
 		}
 	}
@@ -178,6 +260,7 @@ void FlightManagement::revenuePerFlight(ReservationManagement &RMng) {
 	cout <<"Business Seat Revenue : " << BusRevenue <<"$\n";
 	cout << "Total revenue of " << FID << " = "
 	     << fixed << setprecision(2) << revenue << "$\n";
+
 }
 
 //==========================8. Sort flights by Ticket Price ============================//
@@ -193,7 +276,7 @@ void FlightManagement::sortFlightByPrice() {
 	//2. Print sortFlight after sorting
 	headerFlight ();
 
-	for (auto &f : sortFlight) {
+	for (const auto &f : sortFlight) {
 		f.displayFlight();
 	}
 }
@@ -201,9 +284,9 @@ void FlightManagement::sortFlightByPrice() {
 //==========================9. Search by Departure Time =======================//
 void FlightManagement::searchByDepartureTime() {
 
-	FileHelper fHelper;
+	HelperFlight hf;
 	//1. Enter Departure need to FIND
-	string Dep = fHelper.readStringDepartureTime();
+	string Dep = hf.readStringDepartureTime();
 
 	bool found = false;
 
@@ -211,7 +294,7 @@ void FlightManagement::searchByDepartureTime() {
 	headerFlight ();
 
 	//3. Find and show Flight
-	for (auto &f : listFlight) {
+	for (const auto &f : listFlight) {
 		if (f.getDepartureTime() == Dep) {
 			f.displayFlight();
 			found = true;
@@ -221,5 +304,5 @@ void FlightManagement::searchByDepartureTime() {
 	//4. If not found Flight
 	if (!found)
 		cout << "No flight found! (=_=) \n";
-
+	return;
 }

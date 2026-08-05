@@ -11,8 +11,6 @@ class ConsoleIO {
 		int showMainMenu ();
 		int showFlightMenu ();
 		int showReservationMenu ();
-		void saveData (FlightManagement &Fmng, ReservationManagement &RMng);
-		void loadData (FlightManagement &FMng, ReservationManagement &RMng);
 		void askClearScreen ();
 };
 

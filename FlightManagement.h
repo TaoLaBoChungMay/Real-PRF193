@@ -3,45 +3,40 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "Flight.h"
 #include "ReservationManagement.h"
-#include "FileHelper.h"
 class ReservationManagement;
 
 class FlightManagement {
 	protected :
 		vector <Flight> listFlight;
+		int NextFID = 0;
 	public :
 		void addFlightSchedule ();
+		void deleteFlightSchedule ();
 		void updateFlightSchedule ();
 		void searchByDestination ();
 		void revenuePerFlight (ReservationManagement &RMng);
 		void sortFlightByPrice();
 		void searchByDepartureTime();
-		
+
 		// sub-attribute
-		double revenueByFID ;
-		
+		double revenueByFID;
+
 		// sub - method
 		vector<Flight> findFlightByDestination(string Des);
-		Flight* findFlightByFID (string FID);
-		
-		// Hàm in header
+		Flight* findFlightByFID (const string& FID);
+		vector<Flight>::iterator findItByFID(const string& FID);
+		void updateNextIDFromData();
+		// Header
 		void headerFlight ();
 
 		// Getter
-		vector <Flight> &getListFlight (){
-			return listFlight;
-		}
-		double getRevenueByFID (){
-			return revenueByFID;
-		}
+		const vector<Flight>& getListFlight() const;
+		double getRevenueByFID() const;
 		// Setter
-		
-		void setListFlight(vector <Flight> LF){
-			this -> listFlight = LF;
-		}
-		
+		void setListFlight(vector<Flight>& LF);
 		
 };
 

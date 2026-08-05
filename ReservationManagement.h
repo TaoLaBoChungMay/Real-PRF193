@@ -16,6 +16,8 @@ class ReservationManagement {
 	private :
 		vector <Reservation> listReservation;
 		FlightManagement& FMng;			// Can get method from FlightManagement
+		int NextBID = 0;
+		int NextPID = 0;
 
 	public :
 		// Construct
@@ -29,17 +31,14 @@ class ReservationManagement {
 		void displayPassengerGroup();
 
 		// SETTER
-		void setlistReservation (vector <Reservation> lR) {
-			this -> listReservation = lR;
-		}
+		void setlistReservation(const vector<Reservation>& lR);
 
 		// GETTER
-		vector <Reservation> &getlistReservation() {
-			return listReservation;
-		}
-		
+		const vector<Reservation>& getlistReservation() const;
+
 		// Sub- method
 		void headerReservation ();
+		void updateNextIDFromData();
 };
 
 #endif
